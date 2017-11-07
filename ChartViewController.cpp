@@ -15,6 +15,9 @@ void ChartViewController::ConfigureXAxis()
 {
 	m_pAxisX->setFormat( Constants::DATA_FORMAT );
 	m_pChart->addAxis( m_pAxisX, Qt::AlignBottom );
+
+//	m_pAxisX->setMin( QDateTime::fromString( "2017-09-01", Constants::DATA_FORMAT ) );
+//	m_pAxisX->setMax( QDateTime::fromString( "2017-10-01", Constants::DATA_FORMAT ) );
 }
 
 void ChartViewController::Draw( QVector<QPointF> a_SeriesData )
@@ -117,6 +120,13 @@ void ChartViewController::ConfigureView()
 	m_pChartView->setChart( m_pChart );
 	m_pChart->legend()->setAlignment( Qt::AlignBottom );
 	m_pChart->setTitle( "Analiza treningów" );
+	m_pChartView->setRubberBand( QtCharts::QChartView::HorizontalRubberBand );
+	m_pChart->scroll( 10, 10 );
+	m_pChart->scroll( 10, 10 );
+	m_pChart->scroll( 10, 10 );
+	m_pChart->scroll( 10, 10 );
+	m_pChart->scroll( 10, 10 );
+	m_pChart->scroll( 10, 10 );
 }
 
 void ChartViewController::slotOnClearChartTipsClicked()

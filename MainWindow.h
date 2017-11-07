@@ -24,6 +24,7 @@ public:
 private slots:
 	void slotOnQuit( bool a_bChecked );
 	void slotOnAddButtonClicked();
+	void slotOnClicked();
 
 
 private:

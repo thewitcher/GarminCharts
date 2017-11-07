@@ -20,6 +20,7 @@ public:
 
 	void Draw( QVector<QPointF> a_SeriesData );
 	void SetChartView( QtCharts::QChartView* a_pChartView );
+	QtCharts::QChart* m_pChart = new QtCharts::QChart;
 
 public slots:
 	void slotOnClearChartTipsClicked();
@@ -39,7 +40,6 @@ private:
 	QtCharts::QValueAxis* GetYAxis();
 
 	QtCharts::QChartView* m_pChartView = nullptr;
-	QtCharts::QChart* m_pChart = new QtCharts::QChart;
 
 	QtCharts::QDateTimeAxis* m_pAxisX = new QtCharts::QDateTimeAxis;
 	QHash<int, QtCharts::QValueAxis*> m_aYAxises;

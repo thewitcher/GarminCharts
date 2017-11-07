@@ -16,6 +16,8 @@ MainWindow::MainWindow( QWidget* a_pParent )
 	connect( m_pMainWindowUI->m_pActionQuit, &QAction::triggered, this, &MainWindow::slotOnQuit, Qt::UniqueConnection );
 	connect( m_pMainWindowUI->m_pAddPushButton, &QPushButton::clicked, this, &MainWindow::slotOnAddButtonClicked, Qt::UniqueConnection );
 
+	connect( m_pMainWindowUI->pushButton, &QPushButton::clicked, this, &MainWindow::slotOnClicked, Qt::UniqueConnection );
+
 	m_reader.Load( GarminConnector::GetInstance()->GetDownloadPath() + "/activities.csv" );
 	CreateListOfAvailableDataTypes();
 }
@@ -59,6 +61,11 @@ void MainWindow::slotOnAddButtonClicked()
 {
 	QVector<QPointF> aDataToDraw = CreateSeries( m_pMainWindowUI->m_pDataTypeComboBox->currentText() );
 	m_chartViewController.Draw( aDataToDraw );
+}
+
+void MainWindow::slotOnClicked()
+{
+	m_chartViewController.m_pChart->scroll( 10, 0 );
 }
 
 void MainWindow::CreateListOfAvailableDataTypes()
