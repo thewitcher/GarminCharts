@@ -25,6 +25,7 @@ private slots:
 	void slotOnQuit( bool a_bChecked );
 	void slotOnAddButtonClicked();
 
+
 private:
 	QVector<QPointF> CreateSeries( const QString& a_rDataType );
 	void CreateListOfAvailableDataTypes();

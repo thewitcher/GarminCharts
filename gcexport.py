@@ -144,6 +144,8 @@ else:
 	total_to_download = int(args.count)
 total_downloaded = 0
 
+iDownloaded = 0
+
 # This while loop will download data from the server in multiple chunks, if necessary.
 while total_downloaded < total_to_download:
 	# Maximum of 100... 400 return status if over 100.  So download 100 or whatever remains if less than 100.
@@ -171,6 +173,9 @@ while total_downloaded < total_to_download:
 
 	# Process each activity.
 	for a in activities:
+		iDownloaded = iDownloaded + 1
+		print 'Process activity: ' + str( iDownloaded ) + ' / ' + str( total_to_download )
+		
 		# Display which entry we're working on.
 		print 'Garmin Connect activity: [' + a['activity']['activityId'] + ']',
 		print a['activity']['activityName']['value'].encode( 'UTF-8' )

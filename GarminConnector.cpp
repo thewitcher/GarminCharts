@@ -2,6 +2,7 @@
 #include "GarminAccount.h"
 
 #include <QString>
+#include <QDebug>
 
 GarminConnector* GarminConnector::m_pInstance = nullptr;
 
@@ -40,10 +41,20 @@ void GarminConnector::DownloadDataFromGarmin()
 			.arg( pGA->GetLogin() )
 			.arg( pGA->GetPasswd() );
 	}
-	system( strGarminQuery.toStdString().data() );
+
+	m_pProcess->start( strGarminQuery );
+
+	connect( m_pProcess.data(), SIGNAL( started() ), this, SIGNAL( signalDownloadDataStarted() ), Qt::UniqueConnection );
+	connect( m_pProcess.data(), SIGNAL( finished( int, QProcess::ExitStatus ) ), this, SIGNAL( signalDownloadDataFinished( int,QProcess::ExitStatus ) ), Qt::UniqueConnection );
+	connect( m_pProcess.data(), SIGNAL( readyReadStandardOutput() ), this, SLOT( slotOnReadyReadStandardOutput() ), Qt::UniqueConnection );
 }
 
 QString GarminConnector::GetDownloadPath() const
 {
 	return "./" + GarminAccount::GetInstance()->GetName() + "_account";
+}
+
+void GarminConnector::slotOnReadyReadStandardOutput()
+{
+	emit signalReadyReadStandardOutput( QString( m_pProcess->readAllStandardOutput() )/*.split( '\n' )*/ );
 }

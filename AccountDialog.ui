@@ -6,36 +6,22 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>338</width>
-    <height>208</height>
+    <width>718</width>
+    <height>673</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_2">
-   <item row="0" column="0">
+   <item row="1" column="0">
     <widget class="QLabel" name="label">
      <property name="text">
       <string>Konto:</string>
      </property>
     </widget>
    </item>
-   <item row="0" column="1">
-    <widget class="QComboBox" name="m_pAccountComboBox">
-     <item>
-      <property name="text">
-       <string>Marcin</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Agnieszka</string>
-      </property>
-     </item>
-    </widget>
-   </item>
-   <item row="1" column="0" colspan="2">
+   <item row="2" column="0">
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
       <string>Synchronizacja z serwisem Garmin Connect</string>
@@ -68,11 +54,78 @@
      </layout>
     </widget>
    </item>
-   <item row="2" column="1">
+   <item row="4" column="0">
     <widget class="QPushButton" name="m_pOkButton">
      <property name="text">
       <string>Ok</string>
      </property>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QScrollArea" name="scrollArea">
+     <property name="minimumSize">
+      <size>
+       <width>700</width>
+       <height>450</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>700</width>
+       <height>450</height>
+      </size>
+     </property>
+     <property name="widgetResizable">
+      <bool>true</bool>
+     </property>
+     <widget class="QWidget" name="scrollAreaWidgetContents">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>698</width>
+        <height>448</height>
+       </rect>
+      </property>
+      <layout class="QGridLayout" name="gridLayout_3">
+       <item row="0" column="0">
+        <widget class="QLabel" name="m_pOutputLabel">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>600</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QComboBox" name="m_pAccountComboBox">
+     <item>
+      <property name="text">
+       <string>Marcin</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Agnieszka</string>
+      </property>
+     </item>
     </widget>
    </item>
   </layout>

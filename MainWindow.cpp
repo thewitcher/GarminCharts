@@ -16,9 +16,7 @@ MainWindow::MainWindow( QWidget* a_pParent )
 	connect( m_pMainWindowUI->m_pActionQuit, &QAction::triggered, this, &MainWindow::slotOnQuit, Qt::UniqueConnection );
 	connect( m_pMainWindowUI->m_pAddPushButton, &QPushButton::clicked, this, &MainWindow::slotOnAddButtonClicked, Qt::UniqueConnection );
 
-	GarminConnector::GetInstance()->DownloadDataFromGarmin();
 	m_reader.Load( GarminConnector::GetInstance()->GetDownloadPath() + "/activities.csv" );
-
 	CreateListOfAvailableDataTypes();
 }
 
