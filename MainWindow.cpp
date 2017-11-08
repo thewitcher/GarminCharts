@@ -162,5 +162,17 @@ void MainWindow::CreateListOfAvailableDataTypes()
 		{
 			m_pMainWindowUI->m_pDataTypeComboBox->addItem( strType );
 		}
+		if ( strType == Constants::DATA_TYPE_VOMAX )
+		{
+			m_pMainWindowUI->m_pDataTypeComboBox->addItem( strType );
+		}
+		if ( strType == Constants::DATA_TYPE_TRAINING_EFFECT )
+		{
+			m_pMainWindowUI->m_pDataTypeComboBox->addItem( strType );
+		}
+		if ( strType == Constants::DATA_TYPE_DESCRIPTION_HRREST )
+		{
+			m_pMainWindowUI->m_pDataTypeComboBox->addItem( strType );
+		}
 	}
 }

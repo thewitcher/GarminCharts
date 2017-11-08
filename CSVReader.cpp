@@ -56,7 +56,7 @@ bool CSVReader::Load( const QString& a_rFileName )
 	return true;
 }
 
-QVector<qreal> CSVReader::GetDoubleData( const QVector<QString>& a_rData ) const
+QVector<qreal> CSVReader::GetDoubleData( const QVector<QString> &a_rData, std::function<double (double)> a_converter ) const
 {
 	QVector<qreal> aRealData;
 	for ( QString strData : a_rData )
@@ -70,7 +70,36 @@ QVector<qreal> CSVReader::GetDoubleData( const QVector<QString>& a_rData ) const
 		{
 			fData = 0.0;
 		}
-		aRealData.append( fData );
+		aRealData.append( a_converter( fData ) );
+	}
+	return aRealData;
+}
+
+QVector<qreal> CSVReader::GetDoubleDataFromDescription( const QVector<QString>& a_rData, std::function<double (double)> a_converter ) const
+{
+	QVector<qreal> aRealData;
+	for ( QString strData : a_rData )
+	{
+		strData.replace( "\"", "" );
+
+		QRegExp regExp( "HrRest: (\\d+)" );
+
+		QString strHrRest;
+		int pos = 0;
+		while ( ( pos = regExp.indexIn( strData, pos ) ) != -1 )
+		{
+			strHrRest = regExp.cap( 1 );
+			pos += regExp.matchedLength();
+		}
+
+		bool bOk = true;
+		double fData = strHrRest.toDouble( &bOk );
+
+		if ( !bOk )
+		{
+			fData = 0.0;
+		}
+		aRealData.append( a_converter( fData ) );
 	}
 	return aRealData;
 }
@@ -80,7 +109,12 @@ QVector<qreal> CSVReader::GetData( const QString& a_rDataType ) const
 	const int iDataIndex = m_aColumnNames.indexOf( a_rDataType );
 	const QVector<QString>& aData = m_aCSVRepresentation[ iDataIndex ];
 
-	return GetDoubleData( aData );
+	if ( a_rDataType == Constants::DATA_TYPE_DESCRIPTION_HRREST )
+	{
+		return GetDoubleDataFromDescription( aData, []( double a_fValue )->double{ return a_fValue /*/ 1000.0*/; } );
+	}
+
+	return GetDoubleData( aData, []( double a_fValue )->double{ return a_fValue; } );
 }
 
 const QVector<QString>& CSVReader::GetTypes() const

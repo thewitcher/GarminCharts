@@ -17,6 +17,9 @@ public:
 	static QString DATA_TYPE_DURATION;
 	static QString DATA_TYPE_MAX_PACE;
 	static QString DATA_TYPE_START_TIME;
+	static QString DATA_TYPE_TRAINING_EFFECT;
+	static QString DATA_TYPE_VOMAX;
+	static QString DATA_TYPE_DESCRIPTION_HRREST;
 };
 
 #endif // CONSTANTS_H

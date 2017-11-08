@@ -5,6 +5,8 @@
 #include <QVector>
 #include <QHash>
 
+#include "functional"
+
 class CSVReader
 {
 public:
@@ -16,7 +18,8 @@ public:
 	const QVector<QString>& GetTypes() const;
 
 private:
-	QVector<qreal> GetDoubleData( const QVector<QString>& a_rData ) const;
+	QVector<qreal> GetDoubleData( const QVector<QString>& a_rData , std::function<double(double)> a_converter ) const;
+	QVector<qreal> GetDoubleDataFromDescription( const QVector<QString>& a_rData , std::function<double(double)> a_converter ) const;
 
 	QVector<QString> m_aColumnNames;
 	QHash<int, QVector<QString>> m_aCSVRepresentation;

@@ -12,3 +12,6 @@ QString Constants::DATA_TYPE_AVG_PACE = "Average Speed (Raw)";
 QString Constants::DATA_TYPE_DURATION = "Duration (Raw Seconds)";
 QString Constants::DATA_TYPE_MAX_PACE = "Max. Speed (Raw)";
 QString Constants::DATA_TYPE_START_TIME = "Begin Timestamp (Raw Milliseconds)";
+QString Constants::DATA_TYPE_VOMAX = "VO2Max";
+QString Constants::DATA_TYPE_TRAINING_EFFECT = "TrainingEffect";
+QString Constants::DATA_TYPE_DESCRIPTION_HRREST = "Description HrRest";

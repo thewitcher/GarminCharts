@@ -131,7 +131,7 @@ csv_file = open(csv_filename, 'a')
 
 # Write header to CSV file
 if not csv_existed:
-	csv_file.write('Activity ID;Activity Name;Description;Begin Timestamp;Begin Timestamp (Raw Milliseconds);End Timestamp;End Timestamp (Raw Milliseconds);Device;Activity Parent;Activity Type;Event Type;Activity Time Zone;Max. Elevation;Max. Elevation (Raw);Begin Latitude (Decimal Degrees Raw);Begin Longitude (Decimal Degrees Raw);End Latitude (Decimal Degrees Raw);End Longitude (Decimal Degrees Raw);Average Moving Speed;Average Moving Speed (Raw);Max. Heart Rate (bpm);Average Heart Rate (bpm);Max. Speed;Max. Speed (Raw);Calories;Calories (Raw);Duration (h:m:s);Duration (Raw Seconds);Moving Duration (h:m:s);Moving Duration (Raw Seconds);Average Speed;Average Speed (Raw);Distance;Distance (Raw);Min. Heart Rate (bpm);Min. Elevation;Min. Elevation (Raw);Elevation Gain;Elevation Gain (Raw);Elevation Loss;Elevation Loss (Raw)\n')
+	csv_file.write('Activity ID;Activity Name;DescriptionHrRest;Begin Timestamp;Begin Timestamp (Raw Milliseconds);End Timestamp;End Timestamp (Raw Milliseconds);Device;Activity Parent;Activity Type;Event Type;Activity Time Zone;Max. Elevation;Max. Elevation (Raw);Begin Latitude (Decimal Degrees Raw);Begin Longitude (Decimal Degrees Raw);End Latitude (Decimal Degrees Raw);End Longitude (Decimal Degrees Raw);Average Moving Speed;Average Moving Speed (Raw);Max. Heart Rate (bpm);Average Heart Rate (bpm);Max. Speed;Max. Speed (Raw);Calories;Calories (Raw);Duration (h:m:s);Duration (Raw Seconds);Moving Duration (h:m:s);Moving Duration (Raw Seconds);Average Speed;Average Speed (Raw);Distance;Distance (Raw);Min. Heart Rate (bpm);Min. Elevation;Min. Elevation (Raw);Elevation Gain;Elevation Gain (Raw);Elevation Loss;Elevation Loss (Raw);VO2Max;TrainingEffect\n')
 
 download_all = False
 if args.count == 'all':
@@ -287,7 +287,9 @@ while total_downloaded < total_to_download:
 		csv_record += empty_record if 'gainElevation' not in a['activity'] else '"' + a['activity']['gainElevation']['withUnit'].replace('"', '""') + '";'
 		csv_record += empty_record if 'gainElevation' not in a['activity'] else '"' + a['activity']['gainElevation']['value'].replace('"', '""') + '";'
 		csv_record += empty_record if 'lossElevation' not in a['activity'] else '"' + a['activity']['lossElevation']['withUnit'].replace('"', '""') + '";'
-		csv_record += empty_last_record if 'lossElevation' not in a['activity'] else '"' + a['activity']['lossElevation']['value'].replace('"', '""') + '"'
+		csv_record += empty_record if 'lossElevation' not in a['activity'] else '"' + a['activity']['lossElevation']['value'].replace('"', '""') + '";'
+		csv_record += empty_record if 'sumTrainingEffect' not in a['activity'] else '"' + a['activity']['sumTrainingEffect']['display'].replace('"', '""') + '";'
+		csv_record += empty_last_record if 'directVO2Max' not in a['activity'] else '"' + a['activity']['directVO2Max']['display'].replace('"', '""') + '"'
 		csv_record += '\n'
 
 		csv_file.write(csv_record.encode('utf8'))

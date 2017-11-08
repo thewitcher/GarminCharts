@@ -124,10 +124,9 @@ void ChartViewController::ClearChart()
 	m_pChart->removeAllSeries();
 
 	ClearChartTips();
+	ResetDateFilter();
 
 	m_iChartCount = 0;
-
-	ResetDateFilter();
 }
 
 void ChartViewController::ConfigureView()
