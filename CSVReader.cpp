@@ -11,13 +11,13 @@ CSVReader::CSVReader()
 	// Nothing
 }
 
-void CSVReader::Load( const QString& a_rFileName )
+bool CSVReader::Load( const QString& a_rFileName )
 {
 	QFile csvFile( a_rFileName );
 	if ( !csvFile.open( QIODevice::ReadOnly ) )
 	{
 		qWarning() << "File cannot be opened: " << a_rFileName;
-		return;
+		return false;
 	}
 
 	QTextStream reader( &csvFile );
@@ -52,6 +52,8 @@ void CSVReader::Load( const QString& a_rFileName )
 		++iLine;
 		strLine = reader.readLine();
 	}
+
+	return true;
 }
 
 QVector<qreal> CSVReader::GetDoubleData( const QVector<QString>& a_rData ) const

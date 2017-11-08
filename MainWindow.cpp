@@ -2,6 +2,7 @@
 #include "ui_MainWindow.h"
 
 #include "Constants.h"
+#include "Settings.h"
 
 #include <QDebug>
 
@@ -10,21 +11,65 @@ MainWindow::MainWindow( QWidget* a_pParent )
 	, m_pMainWindowUI( new Ui::MainWindow )
 {
 	m_pMainWindowUI->setupUi( this );
-
 	m_chartViewController.SetChartView( m_pMainWindowUI->m_pChartView );
 
-	connect( m_pMainWindowUI->m_pActionQuit, &QAction::triggered, this, &MainWindow::slotOnQuit, Qt::UniqueConnection );
-	connect( m_pMainWindowUI->m_pAddPushButton, &QPushButton::clicked, this, &MainWindow::slotOnAddButtonClicked, Qt::UniqueConnection );
-
-	connect( m_pMainWindowUI->pushButton, &QPushButton::clicked, this, &MainWindow::slotOnClicked, Qt::UniqueConnection );
-
-	m_reader.Load( GarminConnector::GetInstance()->GetDownloadPath() + "/activities.csv" );
-	CreateListOfAvailableDataTypes();
+	CreateConnections();
+	SetupDates();
 }
 
 MainWindow::~MainWindow()
 {
 	delete m_pMainWindowUI;
+}
+
+void MainWindow::CreateConnections()
+{
+	connect( m_pMainWindowUI->m_pActionQuit, &QAction::triggered, this, &MainWindow::slotOnQuit, Qt::UniqueConnection );
+	connect( m_pMainWindowUI->m_pAddPushButton, &QPushButton::clicked, this, &MainWindow::slotOnAddButtonClicked, Qt::UniqueConnection );
+	connect( m_pMainWindowUI->m_pDateFilterButton, &QPushButton::clicked, this, &MainWindow::slotOnDateFilterButtonClicked, Qt::UniqueConnection );
+	connect( m_pMainWindowUI->m_pResetRangeButton, &QPushButton::clicked, this, &MainWindow::slotOnResetRangeButtonClicked, Qt::UniqueConnection );
+	connect( m_pMainWindowUI->m_pClearButton, &QPushButton::clicked, this, &MainWindow::slotOnClearButtonClicked, Qt::UniqueConnection );
+}
+
+void MainWindow::SetupDates()
+{
+	auto pSettings = Settings::GetInstance();
+	const QString strMinDateFromSettings = pSettings->GetSetting( "MinDate" );
+	const QString strMaxDateFromSettings = pSettings->GetSetting( "MaxDate" );
+
+	QDate minDate;
+	QDate maxDate;
+
+	if ( strMaxDateFromSettings.isEmpty() )
+	{
+		maxDate = QDate::currentDate();
+	}
+	else
+	{
+		maxDate = QDate::fromString( strMaxDateFromSettings, Constants::DATA_FORMAT );
+	}
+
+	if ( strMinDateFromSettings.isEmpty() )
+	{
+		minDate = maxDate.addMonths( -2 );
+	}
+	else
+	{
+		minDate = QDate::fromString( strMinDateFromSettings, Constants::DATA_FORMAT );
+	}
+
+	m_pMainWindowUI->m_pMinDate->setDate( minDate );
+	m_pMainWindowUI->m_pMaxDate->setDate( maxDate );
+}
+
+bool MainWindow::LoadCSVFile()
+{
+	if ( m_reader.Load( GarminConnector::GetInstance()->GetDownloadPath() + "/activities.csv" ) )
+	{
+		CreateListOfAvailableDataTypes();
+		return true;
+	}
+	return false;
 }
 
 QVector<QPointF> MainWindow::CreateSeries( const QString& a_rDataType )
@@ -60,12 +105,24 @@ void MainWindow::slotOnQuit( bool /*a_bChecked*/ )
 void MainWindow::slotOnAddButtonClicked()
 {
 	QVector<QPointF> aDataToDraw = CreateSeries( m_pMainWindowUI->m_pDataTypeComboBox->currentText() );
-	m_chartViewController.Draw( aDataToDraw );
+	m_chartViewController.Draw( aDataToDraw, m_pMainWindowUI->m_pDataTypeComboBox->currentText() );
 }
 
-void MainWindow::slotOnClicked()
+void MainWindow::slotOnDateFilterButtonClicked()
 {
-	m_chartViewController.m_pChart->scroll( 10, 0 );
+	m_chartViewController.SetXAxisRange( m_pMainWindowUI->m_pMinDate->dateTime(), m_pMainWindowUI->m_pMaxDate->dateTime() );
+	Settings::GetInstance()->Save( "MinDate", m_pMainWindowUI->m_pMinDate->dateTime().toString( Constants::DATA_FORMAT ) );
+	Settings::GetInstance()->Save( "MaxDate", m_pMainWindowUI->m_pMaxDate->dateTime().toString( Constants::DATA_FORMAT ) );
+}
+
+void MainWindow::slotOnResetRangeButtonClicked()
+{
+	m_chartViewController.ResetDateFilter();
+}
+
+void MainWindow::slotOnClearButtonClicked()
+{
+	m_chartViewController.ClearChart();
 }
 
 void MainWindow::CreateListOfAvailableDataTypes()

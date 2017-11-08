@@ -33,7 +33,8 @@ SOURCES += \
     CSVReader.cpp \
     GarminConnector.cpp \
     AccountDialog.cpp \
-    GarminAccount.cpp
+    GarminAccount.cpp \
+    Settings.cpp
 
 HEADERS += \
     MainWindow.h \
@@ -45,7 +46,8 @@ HEADERS += \
     CSVReader.h \
     GarminConnector.h \
     AccountDialog.h \
-    GarminAccount.h
+    GarminAccount.h \
+    Settings.h
 
 FORMS += \
         MainWindow.ui \

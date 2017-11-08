@@ -20,16 +20,20 @@ public:
 	explicit MainWindow( QWidget* a_pParent = 0 );
 	~MainWindow();
 
+	bool LoadCSVFile();
 
 private slots:
 	void slotOnQuit( bool a_bChecked );
 	void slotOnAddButtonClicked();
-	void slotOnClicked();
-
+	void slotOnDateFilterButtonClicked();
+	void slotOnResetRangeButtonClicked();
+	void slotOnClearButtonClicked();
 
 private:
 	QVector<QPointF> CreateSeries( const QString& a_rDataType );
+	void CreateConnections();
 	void CreateListOfAvailableDataTypes();
+	void SetupDates();
 
 	Ui::MainWindow* m_pMainWindowUI;
 	ChartViewController m_chartViewController;

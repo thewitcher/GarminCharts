@@ -24,7 +24,7 @@ void GarminConnector::DownloadDataFromGarmin()
 
 	if ( GetDownloadCount() == 0 )
 	{
-		emit signalDownloadDataFinished( -1, QProcess::NormalExit );
+		emit signalDownloadNotNeeded();
 		return;
 	}
 	else if ( GetDownloadCount() > 0 )

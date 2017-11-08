@@ -15,12 +15,9 @@ void ChartViewController::ConfigureXAxis()
 {
 	m_pAxisX->setFormat( Constants::DATA_FORMAT );
 	m_pChart->addAxis( m_pAxisX, Qt::AlignBottom );
-
-//	m_pAxisX->setMin( QDateTime::fromString( "2017-09-01", Constants::DATA_FORMAT ) );
-//	m_pAxisX->setMax( QDateTime::fromString( "2017-10-01", Constants::DATA_FORMAT ) );
 }
 
-void ChartViewController::Draw( QVector<QPointF> a_SeriesData )
+void ChartViewController::Draw( QVector<QPointF> a_SeriesData , const QString& a_strLegend )
 {
 	ConfigureXAxis();
 
@@ -31,7 +28,7 @@ void ChartViewController::Draw( QVector<QPointF> a_SeriesData )
 		*pSeries << pPoint;
 	}
 
-	pSeries->setName( "Kalorie" );
+	pSeries->setName( a_strLegend );
 	m_pChart->addSeries( pSeries );
 
 	QtCharts::QValueAxis* pAxisY = GetYAxis();
@@ -40,6 +37,9 @@ void ChartViewController::Draw( QVector<QPointF> a_SeriesData )
 
 	pSeries->attachAxis( m_pAxisX );
 	pSeries->attachAxis( pAxisY );
+
+	KeepOriginaleXRange();
+	FilterXAxisByDate();
 
 	m_iChartCount++;
 }
@@ -63,6 +63,21 @@ void ChartViewController::SetChartView( QtCharts::QChartView* a_pChartView )
 {
 	m_pChartView = a_pChartView;
 	ConfigureView();
+}
+
+void ChartViewController::SetXAxisRange( const QDateTime& a_minDate, const QDateTime& a_maxDate )
+{
+	m_minDate = a_minDate;
+	m_maxDate = a_maxDate;
+	m_pAxisX->setMin( m_minDate );
+	m_pAxisX->setMax( m_maxDate );
+}
+
+void ChartViewController::ResetDateFilter()
+{
+	m_minDate = m_originalMinDate;
+	m_maxDate = m_originalMaxDate;
+	FilterXAxisByDate();
 }
 
 void ChartViewController::slotToolTip( const QPointF& a_rPoint, bool a_bState )
@@ -100,18 +115,19 @@ void ChartViewController::ClearChartTips()
 
 void ChartViewController::ClearChart()
 {
-	m_pChart->removeAxis( m_pAxisX );
-
-	for ( auto pXAxis : m_aYAxises )
+	for ( auto pYAxis : m_aYAxises )
 	{
-		m_pChart->removeAxis( pXAxis );
+		m_pChart->removeAxis( pYAxis );
 	}
 
+	m_aYAxises.clear();
 	m_pChart->removeAllSeries();
 
 	ClearChartTips();
 
 	m_iChartCount = 0;
+
+	ResetDateFilter();
 }
 
 void ChartViewController::ConfigureView()
@@ -121,12 +137,24 @@ void ChartViewController::ConfigureView()
 	m_pChart->legend()->setAlignment( Qt::AlignBottom );
 	m_pChart->setTitle( "Analiza treningów" );
 	m_pChartView->setRubberBand( QtCharts::QChartView::HorizontalRubberBand );
-	m_pChart->scroll( 10, 10 );
-	m_pChart->scroll( 10, 10 );
-	m_pChart->scroll( 10, 10 );
-	m_pChart->scroll( 10, 10 );
-	m_pChart->scroll( 10, 10 );
-	m_pChart->scroll( 10, 10 );
+}
+
+void ChartViewController::KeepOriginaleXRange()
+{
+	m_originalMinDate = m_pAxisX->min();
+	m_originalMaxDate = m_pAxisX->max();
+}
+
+void ChartViewController::FilterXAxisByDate()
+{
+	if ( m_maxDate.isValid() )
+	{
+		m_pAxisX->setMax( m_maxDate );
+	}
+	if ( m_minDate.isValid() )
+	{
+		m_pAxisX->setMin( m_minDate );
+	}
 }
 
 void ChartViewController::slotOnClearChartTipsClicked()

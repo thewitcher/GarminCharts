@@ -70,6 +70,7 @@ void AccountDialog::slotOnOkClicked( bool /*a_bChecked*/ )
 	}
 
 	connect( GarminConnector::GetInstance(), &GarminConnector::signalDownloadDataFinished, this, &AccountDialog::slotOnDownloadDataFinished, Qt::UniqueConnection );
+	connect( GarminConnector::GetInstance(), &GarminConnector::signalDownloadNotNeeded, this, &AccountDialog::accept, Qt::UniqueConnection );
 	connect( GarminConnector::GetInstance(), &GarminConnector::signalDownloadDataStarted, this, &AccountDialog::slotOnDownloadDataStarted, Qt::UniqueConnection );
 	connect( GarminConnector::GetInstance(), &GarminConnector::signalReadyReadStandardOutput, this, &AccountDialog::slotOnReadyReadStandardOutput, Qt::UniqueConnection );
 
@@ -77,21 +78,14 @@ void AccountDialog::slotOnOkClicked( bool /*a_bChecked*/ )
 	GarminConnector::GetInstance()->DownloadDataFromGarmin();
 }
 
-void AccountDialog::slotOnDownloadDataFinished( int a_iExitCode, QProcess::ExitStatus /*a_eExitStatus*/ )
+void AccountDialog::slotOnDownloadDataFinished( int /*a_iExitCode*/, QProcess::ExitStatus /*a_eExitStatus*/ )
 {
-	if ( a_iExitCode == -1 )
-	{
-		accept();
-	}
-	else
-	{
-		m_pUI->m_pOutputLabel->setText( "All files downloaded:)\n" );
+	m_pUI->m_pOutputLabel->setText( "All files downloaded:)\n" );
 
-		disconnect( m_pUI->m_pOkButton, &QRadioButton::clicked, this, &AccountDialog::slotOnOkClicked );
-		connect( m_pUI->m_pOkButton, &QRadioButton::clicked, this, &AccountDialog::accept, Qt::UniqueConnection );
+	disconnect( m_pUI->m_pOkButton, &QRadioButton::clicked, this, &AccountDialog::slotOnOkClicked );
+	connect( m_pUI->m_pOkButton, &QRadioButton::clicked, this, &AccountDialog::accept, Qt::UniqueConnection );
 
-		m_pUI->m_pOkButton->setEnabled( true );
-	}
+	m_pUI->m_pOkButton->setEnabled( true );
 }
 
 void AccountDialog::slotOnDownloadDataStarted()

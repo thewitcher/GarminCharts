@@ -22,6 +22,7 @@ public:
 
 signals:
 	void signalDownloadDataFinished( int a_iExitCode, QProcess::ExitStatus a_eExitStatus );
+	void signalDownloadNotNeeded();
 	void signalReadyReadStandardOutput( const QString& a_rOutput );
 	void signalDownloadDataStarted();
 

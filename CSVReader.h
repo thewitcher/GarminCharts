@@ -10,7 +10,7 @@ class CSVReader
 public:
 	CSVReader();
 
-	void Load( const QString& a_rFileName );
+	bool Load( const QString& a_rFileName );
 
 	QVector<qreal> GetData( const QString& a_rDataType ) const;
 	const QVector<QString>& GetTypes() const;
