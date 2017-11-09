@@ -1,6 +1,8 @@
 #include "ChartViewController.h"
 
 #include "Constants.h"
+#include "LineSeries.h"
+#include "DateHelper.h"
 
 #include <QtCharts/QBarSet>
 #include <QDebug>
@@ -17,18 +19,30 @@ void ChartViewController::ConfigureXAxis()
 	m_pChart->addAxis( m_pAxisX, Qt::AlignBottom );
 }
 
-void ChartViewController::Draw( QVector<QPointF> a_SeriesData , const QString& a_strLegend )
+void ChartViewController::Draw( QVector<QPointF> a_SeriesData , const QString& a_strType )
 {
 	ConfigureXAxis();
 
-	QtCharts::QLineSeries* pSeries = new QtCharts::QLineSeries;
+	LineSeries* pSeries = nullptr;
+	if ( a_strType == Constants::DATA_TYPE_AVG_PACE || a_strType == Constants::DATA_TYPE_MAX_PACE )
+	{
+		pSeries = new LineSeries( m_pChart, []( const qreal a_fValue ) { return DateHelper::GetStringFromSeconds( DateHelper::GetSecondsFromDecimalValue( a_fValue ), "mm:ss" ); } );
+	}
+	else
+	{
+		pSeries = new LineSeries( m_pChart, []( const qreal a_fValue ) { return QString::number( a_fValue ); } );
+	}
+
+
+	connect( pSeries, &QtCharts::QLineSeries::hovered, this, &ChartViewController::slotToolTip, Qt::UniqueConnection );
+	connect( pSeries, &QtCharts::QLineSeries::clicked, this, &ChartViewController::slotKeepChartTip, Qt::UniqueConnection );
 
 	for ( auto pPoint : a_SeriesData )
 	{
 		*pSeries << pPoint;
 	}
 
-	pSeries->setName( a_strLegend );
+	pSeries->setName( a_strType );
 	m_pChart->addSeries( pSeries );
 
 	QtCharts::QValueAxis* pAxisY = GetYAxis();
@@ -59,7 +73,7 @@ QtCharts::QValueAxis* ChartViewController::GetYAxis()
 	return m_aYAxises.value( m_iChartCount );
 }
 
-void ChartViewController::SetChartView( QtCharts::QChartView* a_pChartView )
+void ChartViewController::SetChartView( ChartView* a_pChartView )
 {
 	m_pChartView = a_pChartView;
 	ConfigureView();
@@ -82,15 +96,17 @@ void ChartViewController::ResetDateFilter()
 
 void ChartViewController::slotToolTip( const QPointF& a_rPoint, bool a_bState )
 {
-	if ( m_pChartTip == nullptr )
+	if ( m_pChartTip.isNull() )
 	{
 		m_pChartTip = QSharedPointer<ChartTip>::create( m_pChart );
 	}
 
 	if ( a_bState )
 	{
-		m_pChartTip->SetText( QString( "X: %1 \nY: %2 " ).arg( QDateTime::fromMSecsSinceEpoch( a_rPoint.x() ).toString( Constants::DATA_FORMAT ) ).arg( a_rPoint.y() ) );
-		m_pChartTip->SetAnchor( a_rPoint );
+		LineSeries* pLineSeriesSender = dynamic_cast<LineSeries*>( QObject::sender() );
+
+		m_pChartTip->SetText( QString( "X: %1 \nY: %2 " ).arg( QDateTime::fromMSecsSinceEpoch( a_rPoint.x() ).toString( Constants::DATA_FORMAT ) ).arg( pLineSeriesSender->DisplayValue( a_rPoint.y() ) ) );
+		m_pChartTip->SetAnchor( m_pChart->mapToPosition( a_rPoint, pLineSeriesSender ) );
 		m_pChartTip->setZValue( 11 );
 		m_pChartTip->UpdateGeometry();
 		m_pChartTip->show();
@@ -133,8 +149,11 @@ void ChartViewController::ConfigureView()
 {
 	m_pChartView->setRenderHint( QPainter::Antialiasing );
 	m_pChartView->setChart( m_pChart );
+	m_pChartView->setLineWidth( 10 );
+
 	m_pChart->legend()->setAlignment( Qt::AlignBottom );
 	m_pChart->setTitle( "Analiza treningów" );
+
 	m_pChartView->setRubberBand( QtCharts::QChartView::HorizontalRubberBand );
 }
 
@@ -154,9 +173,4 @@ void ChartViewController::FilterXAxisByDate()
 	{
 		m_pAxisX->setMin( m_minDate );
 	}
-}
-
-void ChartViewController::slotOnClearChartTipsClicked()
-{
-	ClearChartTips();
 }

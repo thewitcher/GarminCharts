@@ -10,6 +10,7 @@
 #include <QDateTime>
 
 #include "ChartTip.h"
+#include "ChartView.h"
 
 class ChartViewController : public QObject
 {
@@ -19,21 +20,18 @@ class ChartViewController : public QObject
 public:
 	ChartViewController();
 
-	void Draw( QVector<QPointF> a_SeriesData, const QString& a_strLegend );
-	void SetChartView( QtCharts::QChartView* a_pChartView );
+	void Draw( QVector<QPointF> a_SeriesData, const QString& a_strType );
+	void SetChartView( ChartView* a_pChartView );
 	void SetXAxisRange( const QDateTime& a_minDate, const QDateTime& a_maxDate );
 	void ResetDateFilter();
 	void ClearChart();
-
-public slots:
-	void slotOnClearChartTipsClicked();
+	void ClearChartTips();
 
 protected slots:
 	void slotToolTip( const QPointF& a_rPoint, bool a_bState );
 	void slotKeepChartTip();
 
 private:
-	void ClearChartTips();
 
 	void ConfigureXAxis();
 	void ConfigureView();
@@ -44,7 +42,7 @@ private:
 	Qt::AlignmentFlag GetYAxisAlignment() const;
 	QtCharts::QValueAxis* GetYAxis();
 
-	QtCharts::QChartView* m_pChartView = nullptr;
+	ChartView* m_pChartView = nullptr;
 	QtCharts::QChart* m_pChart = new QtCharts::QChart;
 
 	QtCharts::QDateTimeAxis* m_pAxisX = new QtCharts::QDateTimeAxis;

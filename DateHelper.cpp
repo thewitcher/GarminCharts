@@ -125,3 +125,10 @@ QTime DateHelper::GetTimeFromSeconds( const int a_iSeconds )
 {
 	return QTime( 0, 0, 0, 0 ).addSecs( a_iSeconds );
 }
+
+qreal DateHelper::GetSecondsFromDecimalValue( const qreal a_fPaceInDecimalValue )
+{
+	double iIntegerPart;
+	double dFractionalPart = modf( a_fPaceInDecimalValue, &iIntegerPart );
+	return iIntegerPart * 60 + dFractionalPart * 60;
+}

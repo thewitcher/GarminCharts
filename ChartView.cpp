@@ -18,10 +18,10 @@ void ChartView::keyPressEvent( QKeyEvent* a_pEvent )
 	{
 		chart()->scroll( 10, 0 );
 	}
-	QWidget::keyPressEvent( a_pEvent );
+	QtCharts::QChartView::keyPressEvent( a_pEvent );
 }
 
 void ChartView::keyReleaseEvent( QKeyEvent* a_pEvent )
 {
-	QWidget::keyReleaseEvent( a_pEvent );
+	QtCharts::QChartView::keyReleaseEvent( a_pEvent );
 }

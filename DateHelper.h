@@ -24,6 +24,8 @@ public:
 
 	static QString GetStringFromSeconds( const int a_iSeconds, const QString& a_rFormat );
 	static QTime GetTimeFromSeconds( const int a_iSeconds );
+
+	static qreal GetSecondsFromDecimalValue( const qreal a_fPaceInDecimalValue );
 };
 
 #endif // DATEHELPER_H

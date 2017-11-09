@@ -7,6 +7,7 @@ class ChartView : public QtCharts::QChartView
 {
 public:
 	ChartView( QWidget* a_pParent = Q_NULLPTR );
+	virtual ~ChartView() {}
 
 protected:
 	void keyPressEvent( QKeyEvent* a_pEvent ) override;

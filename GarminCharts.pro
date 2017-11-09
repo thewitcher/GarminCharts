@@ -35,7 +35,8 @@ SOURCES += \
     AccountDialog.cpp \
     GarminAccount.cpp \
     Settings.cpp \
-    ChartView.cpp
+    ChartView.cpp \
+    LineSeries.cpp
 
 HEADERS += \
     MainWindow.h \
@@ -49,7 +50,8 @@ HEADERS += \
     AccountDialog.h \
     GarminAccount.h \
     Settings.h \
-    ChartView.h
+    ChartView.h \
+    LineSeries.h
 
 FORMS += \
         MainWindow.ui \

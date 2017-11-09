@@ -29,6 +29,7 @@ void MainWindow::CreateConnections()
 	connect( m_pMainWindowUI->m_pDateFilterButton, &QPushButton::clicked, this, &MainWindow::slotOnDateFilterButtonClicked, Qt::UniqueConnection );
 	connect( m_pMainWindowUI->m_pResetRangeButton, &QPushButton::clicked, this, &MainWindow::slotOnResetRangeButtonClicked, Qt::UniqueConnection );
 	connect( m_pMainWindowUI->m_pClearButton, &QPushButton::clicked, this, &MainWindow::slotOnClearButtonClicked, Qt::UniqueConnection );
+	connect( m_pMainWindowUI->m_pDeleteLabels, &QPushButton::clicked, this, &MainWindow::slotOnDeleteLabelsButtonClicked, Qt::UniqueConnection );
 }
 
 void MainWindow::SetupDates()
@@ -123,6 +124,11 @@ void MainWindow::slotOnResetRangeButtonClicked()
 void MainWindow::slotOnClearButtonClicked()
 {
 	m_chartViewController.ClearChart();
+}
+
+void MainWindow::slotOnDeleteLabelsButtonClicked()
+{
+	m_chartViewController.ClearChartTips();
 }
 
 void MainWindow::CreateListOfAvailableDataTypes()

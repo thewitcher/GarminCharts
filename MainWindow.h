@@ -28,6 +28,7 @@ private slots:
 	void slotOnDateFilterButtonClicked();
 	void slotOnResetRangeButtonClicked();
 	void slotOnClearButtonClicked();
+	void slotOnDeleteLabelsButtonClicked();
 
 private:
 	QVector<QPointF> CreateSeries( const QString& a_rDataType );
