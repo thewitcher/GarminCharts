@@ -10,14 +10,14 @@ ChartView::ChartView( QWidget* a_pParent )
 
 void ChartView::keyPressEvent( QKeyEvent* a_pEvent )
 {
-	if ( a_pEvent->key() == Qt::Key_Left )
-	{
-		chart()->scroll( -10, 0 );
-	}
-	else if ( a_pEvent->key() == Qt::Key_Right )
-	{
-		chart()->scroll( 10, 0 );
-	}
+//	if ( a_pEvent->key() == Qt::Key_Left )
+//	{
+//		chart()->scroll( -10, 0 );
+//	}
+//	else if ( a_pEvent->key() == Qt::Key_Right )
+//	{
+//		chart()->scroll( 10, 0 );
+//	}
 	QtCharts::QChartView::keyPressEvent( a_pEvent );
 }
 

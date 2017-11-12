@@ -29,6 +29,8 @@ private slots:
 	void slotOnResetRangeButtonClicked();
 	void slotOnClearButtonClicked();
 	void slotOnDeleteLabelsButtonClicked();
+	void slotOnAddLabelButtonClicked();
+	void slotShowValue( const QPointF& a_rPoint, bool a_bState );
 
 private:
 	QVector<QPointF> CreateSeries( const QString& a_rDataType );

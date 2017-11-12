@@ -19,6 +19,48 @@ void ChartViewController::ConfigureXAxis()
 	m_pChart->addAxis( m_pAxisX, Qt::AlignBottom );
 }
 
+void ChartViewController::DrawChartTipsForSeries( const QString& a_rLabelsMode )
+{
+	ClearChartTips();
+
+	if ( !a_rLabelsMode.isEmpty() )
+	{
+		m_strLabelsMode = a_rLabelsMode;
+	}
+
+	int iFactor = 0;
+
+	if ( m_strLabelsMode == "Bez etykiet" )
+	{
+		return;
+	}
+	else if ( m_strLabelsMode == "Etykieta na każdym punkcie" )
+	{
+		iFactor = 1;
+	}
+	else if ( m_strLabelsMode == "Etykieta na co drugim punkcie" )
+	{
+		iFactor = 2;
+	}
+	else if ( m_strLabelsMode == "Etykieta na co trzecim punkcie" )
+	{
+		iFactor = 3;
+	}
+
+	for ( auto pSerie : m_pChart->series() )
+	{
+		QtCharts::QLineSeries* pLineSeries = dynamic_cast<QtCharts::QLineSeries*>( pSerie );
+		for ( int iIndex = 0 ; iIndex < pLineSeries->count() ; ++iIndex )
+		{
+			if ( iIndex % iFactor == 0 )
+			{
+				QPointF point = pLineSeries->at( iIndex );
+				DrawChartTip( point, pLineSeries );
+			}
+		}
+	}
+}
+
 void ChartViewController::Draw( QVector<QPointF> a_SeriesData , const QString& a_strType )
 {
 	ConfigureXAxis();
@@ -33,14 +75,12 @@ void ChartViewController::Draw( QVector<QPointF> a_SeriesData , const QString& a
 		pSeries = new LineSeries( m_pChart, []( const qreal a_fValue ) { return QString::number( a_fValue ); } );
 	}
 
-
-	connect( pSeries, &QtCharts::QLineSeries::hovered, this, &ChartViewController::slotToolTip, Qt::UniqueConnection );
-	connect( pSeries, &QtCharts::QLineSeries::clicked, this, &ChartViewController::slotKeepChartTip, Qt::UniqueConnection );
-
 	for ( auto pPoint : a_SeriesData )
 	{
 		*pSeries << pPoint;
 	}
+
+	connect( pSeries, &LineSeries::hovered, this, &ChartViewController::signalDataHovered, Qt::UniqueConnection );
 
 	pSeries->setName( a_strType );
 	m_pChart->addSeries( pSeries );
@@ -85,6 +125,8 @@ void ChartViewController::SetXAxisRange( const QDateTime& a_minDate, const QDate
 	m_maxDate = a_maxDate;
 	m_pAxisX->setMin( m_minDate );
 	m_pAxisX->setMax( m_maxDate );
+
+	DrawChartTipsForSeries( "" );
 }
 
 void ChartViewController::ResetDateFilter()
@@ -94,38 +136,22 @@ void ChartViewController::ResetDateFilter()
 	FilterXAxisByDate();
 }
 
-void ChartViewController::slotToolTip( const QPointF& a_rPoint, bool a_bState )
+void ChartViewController::DrawChartTip( const QPointF& a_rPoint, QtCharts::QLineSeries* a_pSerie )
 {
-	if ( m_pChartTip.isNull() )
-	{
-		m_pChartTip = QSharedPointer<ChartTip>::create( m_pChart );
-	}
+	QSharedPointer<ChartTip> pChartTip = QSharedPointer<ChartTip>::create( m_pChart );
+	pChartTip->SetText( QString( "X: %1 \nY: %2 " )
+						.arg( QDateTime::fromMSecsSinceEpoch( a_rPoint.x() ).toString( Constants::DATA_FORMAT ) )
+						.arg( a_rPoint.y() ) );
+	pChartTip->SetAnchor( m_pChart->mapToPosition( a_rPoint, a_pSerie ) );
+	pChartTip->setZValue( 11 );
+	pChartTip->UpdateGeometry();
+	pChartTip->show();
 
-	if ( a_bState )
-	{
-		LineSeries* pLineSeriesSender = dynamic_cast<LineSeries*>( QObject::sender() );
-
-		m_pChartTip->SetText( QString( "X: %1 \nY: %2 " ).arg( QDateTime::fromMSecsSinceEpoch( a_rPoint.x() ).toString( Constants::DATA_FORMAT ) ).arg( pLineSeriesSender->DisplayValue( a_rPoint.y() ) ) );
-		m_pChartTip->SetAnchor( m_pChart->mapToPosition( a_rPoint, pLineSeriesSender ) );
-		m_pChartTip->setZValue( 11 );
-		m_pChartTip->UpdateGeometry();
-		m_pChartTip->show();
-	}
-	else
-	{
-		m_pChartTip->hide();
-	}
-}
-
-void ChartViewController::slotKeepChartTip()
-{
-	m_aChartTips.append( m_pChartTip );
-	m_pChartTip = QSharedPointer<ChartTip>::create( m_pChart );
+	m_aChartTips.append( pChartTip );
 }
 
 void ChartViewController::ClearChartTips()
 {
-	m_pChartTip.clear();
 	m_aChartTips.clear();
 }
 

@@ -35,26 +35,27 @@
 #include <QtGui/QMouseEvent>
 #include <QtCharts/QChart>
 
+#include <QStyleOptionGraphicsItem>
+
 ChartTip::ChartTip( QtCharts::QChart* a_pParent ):
-	QGraphicsItem( a_pParent ),
-	m_pChart( a_pParent )
+	QGraphicsItem( a_pParent )
 {
 	// Nothing
 }
 
 QRectF ChartTip::boundingRect() const
 {
-	return QRect( 0, 0, 150, 150 );
+	return QRect( 0, 0, 50, 50 );
 }
 
-void ChartTip::paint( QPainter* a_pPainter, const QStyleOptionGraphicsItem* /*a_pOption*/, QWidget* /*a_pWidget*/ )
+void ChartTip::paint( QPainter* a_pPainter, const QStyleOptionGraphicsItem* a_pOption, QWidget* /*a_pWidget*/ )
 {
-	QPainterPath path;
-	path.addRoundedRect( m_rect, 5, 5 );
+	QFont font = a_pPainter->font();
+	font.setPixelSize( 8 );
+	a_pPainter->setFont( font );
 
 	a_pPainter->setBrush( QColor( 255, 255, 255 ) );
-	a_pPainter->drawPath( path );
-	a_pPainter->drawText( m_textRect, m_strText );
+	a_pPainter->drawText( a_pOption->rect, m_strText );
 }
 
 void ChartTip::mousePressEvent( QGraphicsSceneMouseEvent* a_pEvent )
@@ -78,17 +79,11 @@ void ChartTip::mouseMoveEvent( QGraphicsSceneMouseEvent* a_pEvent )
 void ChartTip::SetText( const QString& a_rText )
 {
 	m_strText = a_rText;
-	QFontMetrics metrics( m_font );
-	m_textRect = metrics.boundingRect( QRect( 0, 0, 150, 150 ), Qt::AlignLeft, m_strText );
-	m_textRect.translate( 5, 5 );
-	prepareGeometryChange();
-	m_rect = m_textRect.adjusted( -5, -5, 5, 5 );
 }
 
 void ChartTip::SetAnchor( QPointF a_point )
 {
 	m_anchor = a_point;
-	m_anchor = m_anchor - QPointF( -5, m_rect.height() + 5 );
 }
 
 void ChartTip::UpdateGeometry()

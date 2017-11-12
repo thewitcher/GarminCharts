@@ -29,7 +29,8 @@ void MainWindow::CreateConnections()
 	connect( m_pMainWindowUI->m_pDateFilterButton, &QPushButton::clicked, this, &MainWindow::slotOnDateFilterButtonClicked, Qt::UniqueConnection );
 	connect( m_pMainWindowUI->m_pResetRangeButton, &QPushButton::clicked, this, &MainWindow::slotOnResetRangeButtonClicked, Qt::UniqueConnection );
 	connect( m_pMainWindowUI->m_pClearButton, &QPushButton::clicked, this, &MainWindow::slotOnClearButtonClicked, Qt::UniqueConnection );
-	connect( m_pMainWindowUI->m_pDeleteLabels, &QPushButton::clicked, this, &MainWindow::slotOnDeleteLabelsButtonClicked, Qt::UniqueConnection );
+	connect( m_pMainWindowUI->m_pAddLabels, &QPushButton::clicked, this, &MainWindow::slotOnAddLabelButtonClicked, Qt::UniqueConnection );
+	connect( &m_chartViewController, &ChartViewController::signalDataHovered, this, &MainWindow::slotShowValue, Qt::UniqueConnection );
 }
 
 void MainWindow::SetupDates()
@@ -129,6 +130,24 @@ void MainWindow::slotOnClearButtonClicked()
 void MainWindow::slotOnDeleteLabelsButtonClicked()
 {
 	m_chartViewController.ClearChartTips();
+}
+
+void MainWindow::slotOnAddLabelButtonClicked()
+{
+	m_chartViewController.DrawChartTipsForSeries( m_pMainWindowUI->m_pLabelsComboBox->currentText() );
+}
+
+void MainWindow::slotShowValue( const QPointF& a_rPoint, bool a_bState )
+{
+	if ( a_bState )
+	{
+		m_pMainWindowUI->m_pValue->setText( "Data: " + QDateTime::fromMSecsSinceEpoch( a_rPoint.x() ).toString( Constants::DATA_FORMAT ) +
+											", wartość: " + QString::number( a_rPoint.y() ) );
+	}
+	else
+	{
+		m_pMainWindowUI->m_pValue->setText( "" );
+	}
 }
 
 void MainWindow::CreateListOfAvailableDataTypes()

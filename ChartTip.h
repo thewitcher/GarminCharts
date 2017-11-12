@@ -53,11 +53,7 @@ protected:
 
 private:
 	QString m_strText;
-	QRectF m_textRect;
-	QRectF m_rect;
 	QPointF m_anchor;
-	QFont m_font;
-	QtCharts::QChart* m_pChart;
 };
 
 #endif // CHARTTIP_H

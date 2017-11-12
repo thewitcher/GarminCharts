@@ -1,6 +1,8 @@
 #include "DateHelper.h"
 #include "Constants.h"
 
+#include "math.h"
+
 #include <QDebug>
 
 bool DateHelper::IsBefore( const QDate& a_rStartDate, const QDate& a_rEndDate )

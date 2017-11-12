@@ -26,13 +26,15 @@ public:
 	void ResetDateFilter();
 	void ClearChart();
 	void ClearChartTips();
+	void DrawChartTipsForSeries( const QString& a_rLabelsMode );
+
+signals:
+	void signalDataHovered( const QPointF& a_rPoint, bool a_bState );
 
 protected slots:
-	void slotToolTip( const QPointF& a_rPoint, bool a_bState );
-	void slotKeepChartTip();
+	void DrawChartTip( const QPointF& a_rPoint , QtCharts::QLineSeries* a_pSerie );
 
 private:
-
 	void ConfigureXAxis();
 	void ConfigureView();
 
@@ -48,10 +50,11 @@ private:
 	QtCharts::QDateTimeAxis* m_pAxisX = new QtCharts::QDateTimeAxis;
 	QHash<int, QtCharts::QValueAxis*> m_aYAxises;
 
-	QSharedPointer<ChartTip> m_pChartTip;
 	QList<QSharedPointer<ChartTip>> m_aChartTips;
 
 	int m_iChartCount = 0;
+
+	QString m_strLabelsMode = "Bez etykiet";
 
 	QDateTime m_minDate;
 	QDateTime m_maxDate;
