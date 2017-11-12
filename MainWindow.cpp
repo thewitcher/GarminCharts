@@ -30,6 +30,7 @@ void MainWindow::CreateConnections()
 	connect( m_pMainWindowUI->m_pResetRangeButton, &QPushButton::clicked, this, &MainWindow::slotOnResetRangeButtonClicked, Qt::UniqueConnection );
 	connect( m_pMainWindowUI->m_pClearButton, &QPushButton::clicked, this, &MainWindow::slotOnClearButtonClicked, Qt::UniqueConnection );
 	connect( m_pMainWindowUI->m_pAddLabels, &QPushButton::clicked, this, &MainWindow::slotOnAddLabelButtonClicked, Qt::UniqueConnection );
+	connect( m_pMainWindowUI->m_pAddTrendLine, &QPushButton::clicked, this, &MainWindow::slotOnTrendLineButtonClicked, Qt::UniqueConnection );
 	connect( &m_chartViewController, &ChartViewController::signalDataHovered, this, &MainWindow::slotShowValue, Qt::UniqueConnection );
 }
 
@@ -134,7 +135,7 @@ void MainWindow::slotOnDeleteLabelsButtonClicked()
 
 void MainWindow::slotOnAddLabelButtonClicked()
 {
-	m_chartViewController.DrawChartTipsForSeries( m_pMainWindowUI->m_pLabelsComboBox->currentText() );
+	m_chartViewController.DrawChartTips( m_pMainWindowUI->m_pLabelsComboBox->currentText() );
 }
 
 void MainWindow::slotShowValue( const QPointF& a_rPoint, bool a_bState )
@@ -148,6 +149,11 @@ void MainWindow::slotShowValue( const QPointF& a_rPoint, bool a_bState )
 	{
 		m_pMainWindowUI->m_pValue->setText( "" );
 	}
+}
+
+void MainWindow::slotOnTrendLineButtonClicked()
+{
+	m_chartViewController.DrawTrendLines();
 }
 
 void MainWindow::CreateListOfAvailableDataTypes()

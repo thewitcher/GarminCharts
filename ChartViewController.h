@@ -26,7 +26,8 @@ public:
 	void ResetDateFilter();
 	void ClearChart();
 	void ClearChartTips();
-	void DrawChartTipsForSeries( const QString& a_rLabelsMode );
+	void DrawChartTips( const QString& a_rLabelsMode );
+	void DrawTrendLines();
 
 signals:
 	void signalDataHovered( const QPointF& a_rPoint, bool a_bState );
