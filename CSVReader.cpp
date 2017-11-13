@@ -111,7 +111,7 @@ QVector<qreal> CSVReader::GetData( const QString& a_rDataType ) const
 
 	if ( a_rDataType == Constants::DATA_TYPE_DESCRIPTION_HRREST )
 	{
-		return GetDoubleDataFromDescription( aData, []( double a_fValue )->double{ return a_fValue /*/ 1000.0*/; } );
+		return GetDoubleDataFromDescription( aData, []( double a_fValue )->double{ return a_fValue; } );
 	}
 
 	return GetDoubleData( aData, []( double a_fValue )->double{ return a_fValue; } );

@@ -1,7 +1,6 @@
 #include "ChartViewController.h"
 
 #include "Constants.h"
-#include "LineSeries.h"
 #include "DateHelper.h"
 
 #include <QtCharts/QBarSet>
@@ -10,7 +9,7 @@
 
 ChartViewController::ChartViewController()
 {
-	connect( m_pChartView, &ChartView::signalScrollingFinished, this, &ChartViewController::slotOnScrollingFinished, Qt::UniqueConnection );
+	// Nothing
 }
 
 void ChartViewController::ConfigureXAxis()
@@ -143,6 +142,26 @@ void ChartViewController::DrawTrendLines( const QDateTime& a_rMinDate, const QDa
 	}
 }
 
+QString ChartViewController::GetYValueForDisplay( const qreal a_fRawValue, LineSeries* a_pSerie ) const
+{
+	if ( a_pSerie->GetType() == Constants::DATA_TYPE_AVG_PACE )
+	{
+		return DateHelper::GetStringFromSeconds( DateHelper::GetSecondsFromDecimalValue( a_fRawValue ), "mm:ss" );
+	}
+	else if ( a_pSerie->GetType() == Constants::DATA_TYPE_MAX_PACE )
+	{
+		return DateHelper::GetStringFromSeconds( DateHelper::GetSecondsFromDecimalValue( a_fRawValue ), "mm:ss" );
+	}
+	else if ( a_pSerie->GetType() == Constants::DATA_TYPE_DURATION )
+	{
+		return DateHelper::GetStringFromSeconds(a_fRawValue, "HH:mm:ss" );
+	}
+	else
+	{
+		return QString::number( a_fRawValue );
+	}
+}
+
 void ChartViewController::slotOnScrollingFinished()
 {
 	SetXAxisRange( m_pAxisX->min(), m_pAxisX->max() );
@@ -216,6 +235,7 @@ QtCharts::QValueAxis* ChartViewController::GetYAxis()
 void ChartViewController::SetChartView( ChartView* a_pChartView )
 {
 	m_pChartView = a_pChartView;
+	connect( m_pChartView, &ChartView::signalScrollingFinished, this, &ChartViewController::slotOnScrollingFinished, Qt::UniqueConnection );
 	ConfigureView();
 }
 
@@ -229,12 +249,14 @@ void ChartViewController::SetXAxisRange( const QDateTime& a_minDate, const QDate
 	ClearChartTips();
 }
 
-void ChartViewController::DrawChartTip( const QPointF& a_rPoint, QtCharts::QLineSeries* a_pSerie )
+void ChartViewController::DrawChartTip( const QPointF& a_rPoint, LineSeries* a_pSerie )
 {
 	QSharedPointer<ChartTip> pChartTip = QSharedPointer<ChartTip>::create( m_pChart );
+
 	pChartTip->SetText( QString( "X: %1 \nY: %2 " )
-						.arg( QDateTime::fromMSecsSinceEpoch( a_rPoint.x() ).toString( Constants::DATA_FORMAT ) )
-						.arg( a_rPoint.y() ) );
+			.arg( QDateTime::fromMSecsSinceEpoch( a_rPoint.x() ).toString( Constants::DATA_FORMAT ) )
+			.arg( GetYValueForDisplay( a_rPoint.y(), a_pSerie ) ) );
+
 	pChartTip->SetAnchor( m_pChart->mapToPosition( a_rPoint, a_pSerie ) );
 	pChartTip->setZValue( 11 );
 	pChartTip->UpdateGeometry();

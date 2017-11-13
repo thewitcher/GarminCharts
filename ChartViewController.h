@@ -11,6 +11,7 @@
 
 #include "ChartTip.h"
 #include "ChartView.h"
+#include "LineSeries.h"
 
 class ChartViewController : public QObject
 {
@@ -37,8 +38,9 @@ protected slots:
 private:
 	void ConfigureXAxis();
 	void ConfigureView();
-	void DrawChartTip( const QPointF& a_rPoint , QtCharts::QLineSeries* a_pSerie );
+	void DrawChartTip( const QPointF& a_rPoint , LineSeries* a_pSerie );
 	void DrawTrendLines( const QDateTime& a_rMinDate, const QDateTime& a_rMaxDate, const QString& a_rSeriesType );
+	QString GetYValueForDisplay( const qreal a_fRawValue, LineSeries* a_pSerie ) const;
 
 	void FilterXAxisByDate();
 

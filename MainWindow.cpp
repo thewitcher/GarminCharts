@@ -88,13 +88,31 @@ QVector<QPointF> MainWindow::CreateSeries( const QString& a_rDataType )
 	}
 
 	QVector<QPointF> aDataToDraw;
+	QString strCurrentDateTime;
 	for ( int i = 0 ; i < aYData.size() ; ++i )
 	{
 		if ( !aActivityType.at( i ).contains( "Kolarstwo" ) && !aActivityParentType.at( i ).contains( "Kolarstwo" ) )
 		{
 			if ( aYData.at( i ) > 0.0 )
 			{
-				aDataToDraw.append( QPointF( aXData.at( i ), aYData.at( i ) ) );
+				if ( a_rDataType == Constants::DATA_TYPE_CALORIES
+					 || a_rDataType == Constants::DATA_TYPE_DISTANCE
+					 || a_rDataType == Constants::DATA_TYPE_DURATION )
+				{
+					if ( strCurrentDateTime != QDateTime::fromMSecsSinceEpoch( aXData.at( i ) ).toString( Constants::DATA_FORMAT ) )
+					{
+						aDataToDraw.append( QPointF( aXData.at( i ), aYData.at( i ) ) );
+						strCurrentDateTime = QDateTime::fromMSecsSinceEpoch( aXData.at( i ) ).toString( Constants::DATA_FORMAT );
+					}
+					else
+					{
+						aDataToDraw.last() = aDataToDraw.last() + QPointF( 0.0, aYData.at( i ) );
+					}
+				}
+				else
+				{
+					aDataToDraw.append( QPointF( aXData.at( i ), aYData.at( i ) ) );
+				}
 			}
 		}
 	}
