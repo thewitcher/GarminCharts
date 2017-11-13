@@ -27,7 +27,6 @@ void MainWindow::CreateConnections()
 	connect( m_pMainWindowUI->m_pActionQuit, &QAction::triggered, this, &MainWindow::slotOnQuit, Qt::UniqueConnection );
 	connect( m_pMainWindowUI->m_pAddPushButton, &QPushButton::clicked, this, &MainWindow::slotOnAddButtonClicked, Qt::UniqueConnection );
 	connect( m_pMainWindowUI->m_pDateFilterButton, &QPushButton::clicked, this, &MainWindow::slotOnDateFilterButtonClicked, Qt::UniqueConnection );
-	connect( m_pMainWindowUI->m_pResetRangeButton, &QPushButton::clicked, this, &MainWindow::slotOnResetRangeButtonClicked, Qt::UniqueConnection );
 	connect( m_pMainWindowUI->m_pClearButton, &QPushButton::clicked, this, &MainWindow::slotOnClearButtonClicked, Qt::UniqueConnection );
 	connect( m_pMainWindowUI->m_pAddLabels, &QPushButton::clicked, this, &MainWindow::slotOnAddLabelButtonClicked, Qt::UniqueConnection );
 	connect( m_pMainWindowUI->m_pAddTrendLine, &QPushButton::clicked, this, &MainWindow::slotOnTrendLineButtonClicked, Qt::UniqueConnection );
@@ -79,8 +78,10 @@ QVector<QPointF> MainWindow::CreateSeries( const QString& a_rDataType )
 {
 	auto aYData = m_reader.GetData( a_rDataType );
 	auto aXData = m_reader.GetData( "Begin Timestamp (Raw Milliseconds)" );
+	auto aActivityType = m_reader.GetStringData( "Activity Type" );
+	auto aActivityParentType = m_reader.GetStringData( "Activity Parent" );
 
-	if ( aYData.size() != aXData.size() )
+	if ( aYData.size() != aXData.size() && aYData.size() != aActivityType.size() && aYData.size() != aActivityParentType.size() )
 	{
 		qWarning() << "Invalid data to draw";
 		throw 1;
@@ -89,7 +90,13 @@ QVector<QPointF> MainWindow::CreateSeries( const QString& a_rDataType )
 	QVector<QPointF> aDataToDraw;
 	for ( int i = 0 ; i < aYData.size() ; ++i )
 	{
-		aDataToDraw.append( QPointF( aXData.at( i ), aYData.at( i ) ) );
+		if ( !aActivityType.at( i ).contains( "Kolarstwo" ) && !aActivityParentType.at( i ).contains( "Kolarstwo" ) )
+		{
+			if ( aYData.at( i ) > 0.0 )
+			{
+				aDataToDraw.append( QPointF( aXData.at( i ), aYData.at( i ) ) );
+			}
+		}
 	}
 
 	std::sort( aDataToDraw.begin(), aDataToDraw.end(), []( const QPointF& a_rPoint1, const QPointF& a_rPoint2 )->bool
@@ -108,7 +115,7 @@ void MainWindow::slotOnQuit( bool /*a_bChecked*/ )
 void MainWindow::slotOnAddButtonClicked()
 {
 	QVector<QPointF> aDataToDraw = CreateSeries( m_pMainWindowUI->m_pDataTypeComboBox->currentText() );
-	m_chartViewController.Draw( aDataToDraw, m_pMainWindowUI->m_pDataTypeComboBox->currentText() );
+	m_chartViewController.Draw( aDataToDraw, m_pMainWindowUI->m_pDataTypeComboBox->currentText(), false );
 }
 
 void MainWindow::slotOnDateFilterButtonClicked()
@@ -116,11 +123,6 @@ void MainWindow::slotOnDateFilterButtonClicked()
 	m_chartViewController.SetXAxisRange( m_pMainWindowUI->m_pMinDate->dateTime(), m_pMainWindowUI->m_pMaxDate->dateTime() );
 	Settings::GetInstance()->Save( "MinDate", m_pMainWindowUI->m_pMinDate->dateTime().toString( Constants::DATA_FORMAT ) );
 	Settings::GetInstance()->Save( "MaxDate", m_pMainWindowUI->m_pMaxDate->dateTime().toString( Constants::DATA_FORMAT ) );
-}
-
-void MainWindow::slotOnResetRangeButtonClicked()
-{
-	m_chartViewController.ResetDateFilter();
 }
 
 void MainWindow::slotOnClearButtonClicked()
@@ -135,7 +137,7 @@ void MainWindow::slotOnDeleteLabelsButtonClicked()
 
 void MainWindow::slotOnAddLabelButtonClicked()
 {
-	m_chartViewController.DrawChartTips( m_pMainWindowUI->m_pLabelsComboBox->currentText() );
+	m_chartViewController.DrawChartTips( m_pMainWindowUI->m_pLabelsComboBox->currentText(), m_pMainWindowUI->m_pDataTypeComboBox->currentText() );
 }
 
 void MainWindow::slotShowValue( const QPointF& a_rPoint, bool a_bState )
@@ -153,7 +155,7 @@ void MainWindow::slotShowValue( const QPointF& a_rPoint, bool a_bState )
 
 void MainWindow::slotOnTrendLineButtonClicked()
 {
-	m_chartViewController.DrawTrendLines();
+	m_chartViewController.DrawTrendLines( m_pMainWindowUI->m_pDataTypeComboBox->currentText() );
 }
 
 void MainWindow::CreateListOfAvailableDataTypes()

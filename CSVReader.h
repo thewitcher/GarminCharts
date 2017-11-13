@@ -15,6 +15,7 @@ public:
 	bool Load( const QString& a_rFileName );
 
 	QVector<qreal> GetData( const QString& a_rDataType ) const;
+	QVector<QString> GetStringData( const QString& a_rDataType ) const;
 	const QVector<QString>& GetTypes() const;
 
 private:

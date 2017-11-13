@@ -20,6 +20,7 @@ public:
 	static QString DATA_TYPE_TRAINING_EFFECT;
 	static QString DATA_TYPE_VOMAX;
 	static QString DATA_TYPE_DESCRIPTION_HRREST;
+	static QString DATA_TYPE_TREND_LINE;
 };
 
 #endif // CONSTANTS_H

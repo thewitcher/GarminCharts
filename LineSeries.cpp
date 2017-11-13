@@ -1,13 +1,13 @@
 #include "LineSeries.h"
 
-LineSeries::LineSeries( QObject* a_pParent , std::function<QString(qreal)> a_converter )
+LineSeries::LineSeries( QObject* a_pParent, const QString& a_strType )
 	: QtCharts::QLineSeries( a_pParent )
-	, m_converter( a_converter )
+	, m_strType( a_strType )
 {
 	// Nothing
 }
 
-QString LineSeries::DisplayValue( const qreal a_fValue ) const
+QString LineSeries::GetType() const
 {
-	return m_converter( a_fValue );
+	return m_strType;
 }

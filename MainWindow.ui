@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>866</width>
-    <height>135</height>
+    <height>150</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,44 +15,6 @@
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="4">
-     <widget class="QComboBox" name="m_pLabelsComboBox">
-      <item>
-       <property name="text">
-        <string>Bez etykiet</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Etykieta na każdym punkcie</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Etykieta na co drugim punkcie</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Etykieta na co trzecim punkcie</string>
-       </property>
-      </item>
-     </widget>
-    </item>
-    <item row="0" column="5">
-     <widget class="QPushButton" name="m_pAddLabels">
-      <property name="text">
-       <string>Dodaj etykiety</string>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="3">
-     <widget class="QPushButton" name="m_pResetRangeButton">
-      <property name="text">
-       <string>Resetuj zakres</string>
-      </property>
-     </widget>
-    </item>
     <item row="0" column="1">
      <widget class="QPushButton" name="m_pAddPushButton">
       <property name="text">
@@ -94,17 +56,48 @@
       </property>
      </widget>
     </item>
-    <item row="1" column="3">
-     <widget class="QPushButton" name="m_pAddTrendLine">
-      <property name="text">
-       <string>Dodaj linie trendu</string>
-      </property>
-     </widget>
-    </item>
     <item row="5" column="0">
      <widget class="QLabel" name="m_pValue">
       <property name="text">
        <string/>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="4">
+     <widget class="QComboBox" name="m_pLabelsComboBox">
+      <item>
+       <property name="text">
+        <string>Bez etykiet</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Etykieta na każdym punkcie</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Etykieta na co drugim punkcie</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Etykieta na co trzecim punkcie</string>
+       </property>
+      </item>
+     </widget>
+    </item>
+    <item row="0" column="4">
+     <widget class="QPushButton" name="m_pAddLabels">
+      <property name="text">
+       <string>Dodaj etykiety</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="3">
+     <widget class="QPushButton" name="m_pAddTrendLine">
+      <property name="text">
+       <string>Dodaj linię trendu</string>
       </property>
      </widget>
     </item>
@@ -116,7 +109,7 @@
      <x>0</x>
      <y>0</y>
      <width>866</width>
-     <height>22</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuTreningi">

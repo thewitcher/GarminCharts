@@ -10,16 +10,17 @@
 
 ChartViewController::ChartViewController()
 {
-	// Nothing
+	connect( m_pChartView, &ChartView::signalScrollingFinished, this, &ChartViewController::slotOnScrollingFinished, Qt::UniqueConnection );
 }
 
 void ChartViewController::ConfigureXAxis()
 {
 	m_pAxisX->setFormat( Constants::DATA_FORMAT );
+	m_pAxisX->setTickCount( 20 );
 	m_pChart->addAxis( m_pAxisX, Qt::AlignBottom );
 }
 
-void ChartViewController::DrawChartTips( const QString& a_rLabelsMode )
+void ChartViewController::DrawChartTips( const QString& a_rLabelsMode, const QString& a_rSeriesType )
 {
 	ClearChartTips();
 
@@ -49,75 +50,109 @@ void ChartViewController::DrawChartTips( const QString& a_rLabelsMode )
 
 	for ( auto pSerie : m_pChart->series() )
 	{
-		QtCharts::QLineSeries* pLineSeries = dynamic_cast<QtCharts::QLineSeries*>( pSerie );
-		for ( int iIndex = 0 ; iIndex < pLineSeries->count() ; ++iIndex )
+		LineSeries* pLineSeries = dynamic_cast<LineSeries*>( pSerie );
+		if ( pLineSeries->GetType() == a_rSeriesType )
 		{
-			if ( iIndex % iFactor == 0 )
+			for ( int iIndex = 0 ; iIndex < pLineSeries->count() ; ++iIndex )
 			{
-				QPointF point = pLineSeries->at( iIndex );
-				DrawChartTip( point, pLineSeries );
+				if ( iIndex % iFactor == 0 )
+				{
+					QPointF point = pLineSeries->at( iIndex );
+					DrawChartTip( point, pLineSeries );
+				}
 			}
+			break;
 		}
 	}
 }
 
-void ChartViewController::DrawTrendLines()
+void ChartViewController::DrawTrendLines( const QString& a_rSeriesType )
+{
+	DrawTrendLines( m_pAxisX->min(), m_pAxisX->max(), a_rSeriesType );
+}
+
+/** <!--------------------------------------------------------------------------------------------->
+ *
+ * y = ax+b
+ *
+ * a = [(1/N)SUM_t(ty) -t'y'] / [(1/N)SUM_t(t - t')^2]
+ * N - data count
+ * t - index of data: 1, 2, 3, ...
+ * y - data value
+ * ' - average of data
+ *
+ * b = y'-at'
+ <!---------------------------------------------------------------------------------------------> */
+void ChartViewController::DrawTrendLines( const QDateTime& a_rMinDate, const QDateTime& a_rMaxDate, const QString& a_rSeriesType )
 {
 	for ( auto pSerie : m_pChart->series() )
 	{
-		QtCharts::QLineSeries* pLineSeries = dynamic_cast<QtCharts::QLineSeries*>( pSerie );
-		float ty = 0.0;
-		float avgT = 0.0;
-		float avgY = 0.0;
-		for ( int iIndex = 0 ; iIndex < pLineSeries->count() ; ++iIndex )
+		LineSeries* pLineSeries = dynamic_cast<LineSeries*>( pSerie );
+		if ( pLineSeries->GetType() == a_rSeriesType )
 		{
-			QPointF point = pLineSeries->at( iIndex );
+			qreal ty = 0.0;
+			qreal avgT = 0.0;
+			qreal avgY = 0.0;
+			int iCount = 0;
+			for ( int iIndex = 0 ; iIndex < pLineSeries->count() ; ++iIndex )
+			{
+				QPointF point = pLineSeries->at( iIndex );
 
-			avgT += iIndex;
-			avgY += point.y();
+				if ( a_rMinDate.toMSecsSinceEpoch() <= point.x() && point.x() <= a_rMaxDate.toMSecsSinceEpoch() )
+				{
+					avgT += point.x();
+					avgY += point.y();
 
-			ty += iIndex * point.y();
+					ty += point.x() * point.y();
+
+					iCount++;
+				}
+			}
+
+			qreal tyDividedByCount = ty / qreal( iCount );
+			avgT = avgT / qreal( iCount );
+			avgY = avgY / qreal( iCount );
+
+			qreal TtimesY = avgT * avgY;
+
+			qreal numeratorValue = tyDividedByCount - TtimesY;
+
+			qreal denominatorValue = 0.0;
+			for ( int iIndex = 0 ; iIndex < pLineSeries->count() ; ++iIndex )
+			{
+				QPointF point = pLineSeries->at( iIndex );
+
+				if ( a_rMinDate.toMSecsSinceEpoch() <= point.x() && point.x() <= a_rMaxDate.toMSecsSinceEpoch() )
+				{
+					denominatorValue += ( point.x() - avgT ) * ( point.x() - avgT );
+				}
+			}
+			denominatorValue = denominatorValue / qreal( iCount );
+
+			qreal a1 = numeratorValue / denominatorValue;
+			qreal a0 = avgY - a1 * avgT;
+
+			QVector<QPointF> aData;
+			aData << QPointF( m_pAxisX->min().toMSecsSinceEpoch(), m_pAxisX->min().toMSecsSinceEpoch() * a1 + a0 )
+				  << QPointF( m_pAxisX->max().toMSecsSinceEpoch(), m_pAxisX->max().toMSecsSinceEpoch() * a1 + a0 );
+
+			Draw( aData, a_rSeriesType, true );
+
+			break;
 		}
-
-		float tyDividedByCount = ty / float( pLineSeries->count() );
-		avgT = avgT / pLineSeries->count();
-		avgY = avgY / pLineSeries->count();
-
-		float TtimesY = avgT * avgY;
-
-		float upValue = tyDividedByCount - TtimesY;
-
-		float downValue = 0.0;
-		for ( int iIndex = 0 ; iIndex < pLineSeries->count() ; ++iIndex )
-		{
-			downValue += ( iIndex - avgT ) * ( iIndex - avgT );
-		}
-		downValue = downValue / float( pLineSeries->count() );
-
-		float a1 = upValue / downValue;
-		float a0 = avgY - a1 * avgT;
-
-		QVector<QPointF> aData;
-		aData << QPointF( m_pAxisX->min().toMSecsSinceEpoch(), m_pAxisX->min().toMSecsSinceEpoch() * a1 + a0 )
-			  << QPointF( m_pAxisX->max().toMSecsSinceEpoch(), m_pAxisX->max().toMSecsSinceEpoch() * a1 + a0 );
-
-		Draw( aData, "Linia trendu" );
 	}
 }
 
-void ChartViewController::Draw( QVector<QPointF> a_SeriesData , const QString& a_strType )
+void ChartViewController::slotOnScrollingFinished()
+{
+	SetXAxisRange( m_pAxisX->min(), m_pAxisX->max() );
+}
+
+void ChartViewController::Draw( QVector<QPointF> a_SeriesData , const QString& a_rType, bool a_bTrendLine )
 {
 	ConfigureXAxis();
 
-	LineSeries* pSeries = nullptr;
-	if ( a_strType == Constants::DATA_TYPE_AVG_PACE || a_strType == Constants::DATA_TYPE_MAX_PACE )
-	{
-		pSeries = new LineSeries( m_pChart, []( const qreal a_fValue ) { return DateHelper::GetStringFromSeconds( DateHelper::GetSecondsFromDecimalValue( a_fValue ), "mm:ss" ); } );
-	}
-	else
-	{
-		pSeries = new LineSeries( m_pChart, []( const qreal a_fValue ) { return QString::number( a_fValue ); } );
-	}
+	LineSeries* pSeries = new LineSeries( m_pChart, a_rType );
 
 	for ( auto pPoint : a_SeriesData )
 	{
@@ -126,17 +161,38 @@ void ChartViewController::Draw( QVector<QPointF> a_SeriesData , const QString& a
 
 	connect( pSeries, &LineSeries::hovered, this, &ChartViewController::signalDataHovered, Qt::UniqueConnection );
 
-	pSeries->setName( a_strType );
+	pSeries->setName( a_rType );
 	m_pChart->addSeries( pSeries );
 
-	QtCharts::QValueAxis* pAxisY = GetYAxis();
-	pAxisY->setLinePenColor( pSeries->pen().color() );
-	m_pChart->addAxis( pAxisY, GetYAxisAlignment() );
-
 	pSeries->attachAxis( m_pAxisX );
-	pSeries->attachAxis( pAxisY );
 
-	KeepOriginaleXRange();
+	if ( a_bTrendLine )
+	{
+		pSeries->setName( a_rType + QString( " - " + Constants::DATA_TYPE_TREND_LINE ) );
+		for ( auto pSerie : m_pChart->series() )
+		{
+			LineSeries* pLineSeries = dynamic_cast<LineSeries*>( pSerie );
+			if ( pLineSeries->GetType() == a_rType )
+			{
+				for ( auto pAxis : pLineSeries->attachedAxes() )
+				{
+					if ( pAxis->orientation() == Qt::Vertical )
+					{
+						pSeries->attachAxis( pAxis );
+					}
+				}
+				break;
+			}
+		}
+	}
+	else
+	{
+		QtCharts::QValueAxis* pAxisY = GetYAxis();
+		pAxisY->setLinePenColor( pSeries->pen().color() );
+		m_pChart->addAxis( pAxisY, GetYAxisAlignment() );
+		pSeries->attachAxis( pAxisY );
+	}
+
 	FilterXAxisByDate();
 
 	m_iChartCount++;
@@ -170,14 +226,7 @@ void ChartViewController::SetXAxisRange( const QDateTime& a_minDate, const QDate
 	m_pAxisX->setMin( m_minDate );
 	m_pAxisX->setMax( m_maxDate );
 
-	DrawChartTips( "" );
-}
-
-void ChartViewController::ResetDateFilter()
-{
-	m_minDate = m_originalMinDate;
-	m_maxDate = m_originalMaxDate;
-	FilterXAxisByDate();
+	ClearChartTips();
 }
 
 void ChartViewController::DrawChartTip( const QPointF& a_rPoint, QtCharts::QLineSeries* a_pSerie )
@@ -210,7 +259,6 @@ void ChartViewController::ClearChart()
 	m_pChart->removeAllSeries();
 
 	ClearChartTips();
-	ResetDateFilter();
 
 	m_iChartCount = 0;
 }
@@ -225,12 +273,6 @@ void ChartViewController::ConfigureView()
 	m_pChart->setTitle( "Analiza treningów" );
 
 	m_pChartView->setRubberBand( QtCharts::QChartView::HorizontalRubberBand );
-}
-
-void ChartViewController::KeepOriginaleXRange()
-{
-	m_originalMinDate = m_pAxisX->min();
-	m_originalMaxDate = m_pAxisX->max();
 }
 
 void ChartViewController::FilterXAxisByDate()

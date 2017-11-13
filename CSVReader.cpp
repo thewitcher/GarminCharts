@@ -117,6 +117,12 @@ QVector<qreal> CSVReader::GetData( const QString& a_rDataType ) const
 	return GetDoubleData( aData, []( double a_fValue )->double{ return a_fValue; } );
 }
 
+QVector<QString> CSVReader::GetStringData( const QString& a_rDataType ) const
+{
+	const int iDataIndex = m_aColumnNames.indexOf( a_rDataType );
+	return m_aCSVRepresentation[ iDataIndex ];
+}
+
 const QVector<QString>& CSVReader::GetTypes() const
 {
 	return m_aColumnNames;

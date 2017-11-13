@@ -8,13 +8,13 @@
 class LineSeries : public QtCharts::QLineSeries
 {
 public:
-	LineSeries( QObject* a_pParent, std::function<QString(qreal)> a_converter );
+	LineSeries( QObject* a_pParent, const QString& a_strType );
 	virtual ~LineSeries() {}
 
-	QString DisplayValue( const qreal a_fValue ) const;
+	QString GetType() const;
 
 private:
-	std::function<QString(qreal)> m_converter = []( const qreal a_fValue ) { return QString::number( a_fValue ); };
+	const QString m_strType = "";
 };
 
 #endif // LINESERIES_H

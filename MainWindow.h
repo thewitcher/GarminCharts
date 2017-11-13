@@ -26,7 +26,6 @@ private slots:
 	void slotOnQuit( bool a_bChecked );
 	void slotOnAddButtonClicked();
 	void slotOnDateFilterButtonClicked();
-	void slotOnResetRangeButtonClicked();
 	void slotOnClearButtonClicked();
 	void slotOnDeleteLabelsButtonClicked();
 	void slotOnAddLabelButtonClicked();

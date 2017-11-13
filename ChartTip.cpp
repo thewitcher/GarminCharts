@@ -45,7 +45,7 @@ ChartTip::ChartTip( QtCharts::QChart* a_pParent ):
 
 QRectF ChartTip::boundingRect() const
 {
-	return QRect( 0, 0, 50, 50 );
+	return QRect( 0, 0, 60, 60 );
 }
 
 void ChartTip::paint( QPainter* a_pPainter, const QStyleOptionGraphicsItem* a_pOption, QWidget* /*a_pWidget*/ )

@@ -15,3 +15,4 @@ QString Constants::DATA_TYPE_START_TIME = "Begin Timestamp (Raw Milliseconds)";
 QString Constants::DATA_TYPE_VOMAX = "VO2Max";
 QString Constants::DATA_TYPE_TRAINING_EFFECT = "TrainingEffect";
 QString Constants::DATA_TYPE_DESCRIPTION_HRREST = "Description HrRest";
+QString Constants::DATA_TYPE_TREND_LINE = "Trend Line";

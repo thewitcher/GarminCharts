@@ -20,26 +20,26 @@ class ChartViewController : public QObject
 public:
 	ChartViewController();
 
-	void Draw( QVector<QPointF> a_SeriesData, const QString& a_strType );
+	void Draw( QVector<QPointF> a_SeriesData, const QString& a_rType , bool a_bTrendLine );
 	void SetChartView( ChartView* a_pChartView );
 	void SetXAxisRange( const QDateTime& a_minDate, const QDateTime& a_maxDate );
-	void ResetDateFilter();
 	void ClearChart();
 	void ClearChartTips();
-	void DrawChartTips( const QString& a_rLabelsMode );
-	void DrawTrendLines();
+	void DrawChartTips( const QString& a_rLabelsMode, const QString& a_rSeriesType );
+	void DrawTrendLines( const QString& a_rSeriesType );
 
 signals:
 	void signalDataHovered( const QPointF& a_rPoint, bool a_bState );
 
 protected slots:
-	void DrawChartTip( const QPointF& a_rPoint , QtCharts::QLineSeries* a_pSerie );
+	void slotOnScrollingFinished();
 
 private:
 	void ConfigureXAxis();
 	void ConfigureView();
+	void DrawChartTip( const QPointF& a_rPoint , QtCharts::QLineSeries* a_pSerie );
+	void DrawTrendLines( const QDateTime& a_rMinDate, const QDateTime& a_rMaxDate, const QString& a_rSeriesType );
 
-	void KeepOriginaleXRange();
 	void FilterXAxisByDate();
 
 	Qt::AlignmentFlag GetYAxisAlignment() const;
@@ -59,9 +59,6 @@ private:
 
 	QDateTime m_minDate;
 	QDateTime m_maxDate;
-
-	QDateTime m_originalMinDate;
-	QDateTime m_originalMaxDate;
 };
 
 #endif // CHARTVIEWCONTROLLER_H
